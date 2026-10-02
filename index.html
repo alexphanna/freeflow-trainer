@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <title>Freeflow Trainer</title>
+    <title>Freeflow Combat Trainer</title>
     <link rel="stylesheet" type="text/css" href="style.css">
   </head>
 
@@ -11,6 +11,7 @@
       <canvas id="webgl" width="800" height="800">
         Please use a browser that supports "canvas"
       </canvas>
+      <p id="combo-meter">0</p>
     </center>
 
     <script src="lib/webgl-utils.js"></script>
@@ -18,8 +19,10 @@
     <script src="lib/cuon-utils.js"></script>
     <script src="lib/cuon-matrix.js"></script>
     <script src="constants.js"></script>
+    <script src="debug.js"></script>
+    <script src="shapes/polygon.js"></script>
+    <script src="shapes/circle.js"></script>
     <script src="freeflow-trainer.js"></script>
-    <script src="circle.js"></script>
     <script src="entity.js"></script>
     <script src="enemy.js"></script>
     <script src="player.js"></script>

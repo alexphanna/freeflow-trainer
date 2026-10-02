@@ -1,14 +1,15 @@
-class Circle {
-    constructor(x, y, radius, r, g, b) {
+class Polygon {
+    constructor(x, y, radius, r, g, b, sides) {
         this.x = x;
         this.y = y;
         this.r = r;
         this.g = g;
         this.b = b;
         this.radius = radius;
+        this.sides = sides;
     }
     draw(gl) {
-        var n = 100; // The number of vertices
+        var n = this.sides; // The number of vertices
         var vertices = new Float32Array(n * 5);
         for (var i = 0; i < n; i += 1) {
             vertices[i * 5 + 0] = Math.sin(Math.PI * 2 / n * i) * this.radius + this.x;

@@ -1,5 +1,5 @@
 class Enemy extends Entity {
-    constructor(x, y) {
-        super(x, y, 1, 0, 0, .0001)
+    constructor(id, x, y) {
+        super(id, x, y, .1, 1, 0, 0, .0002)
     }
 }

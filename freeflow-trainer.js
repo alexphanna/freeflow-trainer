@@ -43,11 +43,17 @@ function main() {
   // Clear <canvas>
   gl.clear(gl.COLOR_BUFFER_BIT);
 
+  gameLoop(gl, canvas);
+}
+
+function gameLoop(gl, canvas) {
   var enemies = [];
   for (var i = 0; i < 4; i++) {
     var angle = Math.PI * 2 * Math.random();
-    enemies.push(new Enemy(Math.sin(angle), Math.cos(angle)));
+    // spawn enemy at random location inside arena
+    enemies.push(new Enemy(i, Math.sin(angle) * (Math.random() * .5 + .5), Math.cos(angle) * (Math.random() * .5 + .5)));
   }
+  var enemyIndex = 0;
 
   var player = new Player(0, 0)
     
@@ -60,73 +66,58 @@ function main() {
       e.gamepad.buttons.length,
       e.gamepad.axes.length,
     );
-    const gp = navigator.getGamepads()[e.gamepad.index];
     
     // Start drawing
     var tick = function() {
+      let gp = navigator.getGamepads()[e.gamepad.index];
+
       // Draw static shapes
-      var arena = new Circle(0, 0, 1)
+      var arena = new Circle(0, 0, 1, 0, 0, 0)
       arena.draw(gl);
 
-      player.draw(gl);
-      player.moveTowards(gp.axes[0], -gp.axes[1])
-
       // Square pressed
-      if (gp.buttons[2].pressed == true) {
-        player.attack(enemies)
+      if (gp.buttons[2].pressed == true && Date.now() - player.lastAttack > ATTACK_COOLDOWN) {
+        var closestEnemy = player.getClosestEntity(enemies);
+
+        if (closestEnemy == null) 
+          return;
+
+        player.attack(closestEnemy);
+
+        gp.vibrationActuator.playEffect("dual-rumble", {
+          startDelay: 0,
+          duration: 100,
+          weakMagnitude: 1.0,
+          strongMagnitude: 1.0,
+        });
+
+        // Should only increment if current attacking enemy is the same as the attacked enemy
+        if (closestEnemy.id == enemies[enemyIndex].id)
+          enemyIndex++;
       }
 
-      enemies.forEach(enemy => {
-        enemy.draw(gl)
-        enemy.moveTowardsEntity(player)
-        drawLine(gl, enemy.x, enemy.y, player.x, player.y)
-      })
+      for (var i = 0; i < enemies.length; i++) {
+        enemies[i].draw(gl)
+
+        // move the enemy whose up towards player
+        if (i == enemyIndex) {
+          enemies[i].moveTowardsEntity(player)
+          // debug tracking line
+          drawLine(gl, enemies[i].x, enemies[i].y, player.x, player.y)
+        }
+        else {
+          // idle animation
+          enemies[i].lastMove = Date.now();
+          //enemies[i].moveTowards(enemiesMath.random(), Math.random());
+        }
+      }
+      
+      // player should be drawn after enemies
+      player.draw(gl, enemies);
+      player.moveTowards(player.x + gp.axes[0] / 100, player.y - gp.axes[1] / 100) // 100 is arbitrary
+
       requestAnimationFrame(tick, canvas); // Request that the browser calls tick*/
     };
     tick();
   });
-}
-
-function drawLine(gl, x0, y0, x1, y1) {
-  var vertices = new Float32Array([
-    x0, y0, 0, 1, 0,  
-    x1, y1, 0, 1, 0
-  ]);
-  var n = 2; // The number of vertices
-
-  // Create a buffer object
-  var vertexBuffer = gl.createBuffer();
-  if (!vertexBuffer) {
-      console.log('Failed to create the buffer object');
-      return -1;
-  }
-
-  // Bind the buffer object to target
-  gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
-  // Write date into the buffer object
-  gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
-
-  const FSIZE = Float32Array.BYTES_PER_ELEMENT;
-
-  var a_Position = gl.getAttribLocation(gl.program, 'a_Position');
-  if (a_Position < 0) {
-      console.log('Failed to get the storage location of a_Position');
-      return -1;
-  }
-  // Assign the buffer object to a_Position variable
-  gl.vertexAttribPointer(a_Position, 2, gl.FLOAT, false, FSIZE * 5, 0);
-
-  // Enable the assignment to a_Position variable
-  gl.enableVertexAttribArray(a_Position);
-
-  var a_FragColor = gl.getAttribLocation(gl.program, 'a_Color');
-  if (a_FragColor < 0) {
-      console.log('Failed to get the storage location of a_Color');
-      return -1;
-  }
-  
-  gl.vertexAttribPointer(a_FragColor, 3, gl.FLOAT, false, FSIZE * 5, FSIZE * 2);
-  gl.enableVertexAttribArray(a_FragColor);
-
-  gl.drawArrays(gl.LINES, 0, n);
 }
