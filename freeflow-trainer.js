@@ -71,6 +71,11 @@ function main() {
       player.draw(gl);
       player.moveTowards(gp.axes[0], -gp.axes[1])
 
+      // Square pressed
+      if (gp.buttons[2].pressed == true) {
+        player.attack(enemies)
+      }
+
       enemies.forEach(enemy => {
         enemy.draw(gl)
         enemy.moveTowardsEntity(player)

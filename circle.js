@@ -6,7 +6,6 @@ class Circle {
         this.g = g;
         this.b = b;
         this.radius = radius;
-        this.g_last = Date.now();
     }
     draw(gl) {
         var n = 100; // The number of vertices
