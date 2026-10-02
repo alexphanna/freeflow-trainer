@@ -38,7 +38,7 @@ function main() {
   }
 
   // Specify the color for clearing <canvas>
-  gl.clearColor(1, 1, 1, 1);
+  gl.clearColor(0, 0, 0, 1);
 
   // Clear <canvas>
   gl.clear(gl.COLOR_BUFFER_BIT);
@@ -48,14 +48,15 @@ function main() {
 
 function gameLoop(gl, canvas) {
   var enemies = [];
-  for (var i = 0; i < 4; i++) {
+  for (var i = 0; i < 10; i++) {
     var angle = Math.PI * 2 * Math.random();
     // spawn enemy at random location inside arena
     enemies.push(new Enemy(i, Math.sin(angle) * (Math.random() * .5 + .5), Math.cos(angle) * (Math.random() * .5 + .5)));
   }
   var enemyIndex = 0;
 
-  var player = new Player(0, 0)
+  var player = new Player(0, 0);
+  player.aimTowardsEntity(enemies[enemyIndex]);
     
   window.addEventListener("gamepadconnected", (e) => {
     // https://developer.mozilla.org/en-US/docs/Web/API/Gamepad_API/Using_the_Gamepad_API
@@ -72,28 +73,33 @@ function gameLoop(gl, canvas) {
       let gp = navigator.getGamepads()[e.gamepad.index];
 
       // Draw static shapes
-      var arena = new Circle(0, 0, 1, 0, 0, 0)
+      // #4988a4
+      var arena = new Polygon(0, 0, 1, .25, .5, .625, 12)
       arena.draw(gl);
 
       // Square pressed
       if (gp.buttons[2].pressed == true && Date.now() - player.lastAttack > ATTACK_COOLDOWN) {
-        var closestEnemy = player.getClosestEntity(enemies);
+        var closestEnemy = player.getClosestEnemy(enemies);
 
-        if (closestEnemy == null) 
-          return;
+        if (closestEnemy != null) {
+          player.attack(closestEnemy);
 
-        player.attack(closestEnemy);
+          gp.vibrationActuator.playEffect("dual-rumble", {
+            startDelay: 0,
+            duration: 100,
+            weakMagnitude: 1.0,
+            strongMagnitude: 1.0,
+          });
 
-        gp.vibrationActuator.playEffect("dual-rumble", {
-          startDelay: 0,
-          duration: 100,
-          weakMagnitude: 1.0,
-          strongMagnitude: 1.0,
-        });
+          // Should only increment if current attacking enemy is the same as the attacked enemy
+          if (closestEnemy.id == enemies[enemyIndex].id)
+            enemyIndex = (enemyIndex + 1) % enemies.length;
 
-        // Should only increment if current attacking enemy is the same as the attacked enemy
-        if (closestEnemy.id == enemies[enemyIndex].id)
-          enemyIndex++;
+          /*closestEnemy = player.getClosestEntity(enemies);
+          if (closestEnemy != null)
+            player.aimTowardsEntity(closestEnemy);*/
+          player.aimTowardsEntity(enemies[enemyIndex]);
+        }
       }
 
       for (var i = 0; i < enemies.length; i++) {
@@ -103,7 +109,7 @@ function gameLoop(gl, canvas) {
         if (i == enemyIndex) {
           enemies[i].moveTowardsEntity(player)
           // debug tracking line
-          drawLine(gl, enemies[i].x, enemies[i].y, player.x, player.y)
+          //drawLine(gl, enemies[i].x, enemies[i].y, player.x, player.y, 0, 1, 0)
         }
         else {
           // idle animation
@@ -114,7 +120,15 @@ function gameLoop(gl, canvas) {
       
       // player should be drawn after enemies
       player.draw(gl, enemies);
-      player.moveTowards(player.x + gp.axes[0] / 100, player.y - gp.axes[1] / 100) // 100 is arbitrary
+      if (Math.abs(gp.axes[0]) > 0.25 || Math.abs(gp.axes[1]) > 0.25) {
+        player.moveTowards(player.x + gp.axes[0] / 100, player.y - gp.axes[1] / 100) // 100 is arbitrary
+      }
+      
+      // very imperfect, supposed to make aim position stay when finger off joystick
+      if (Math.abs(gp.axes[2]) > 0.25 || Math.abs(gp.axes[3]) > 0.25) {
+        player.aimTowards(gp.axes[2], -gp.axes[3]);
+      }
+      // drawLine(gl, player.x, player.y, player.aimX, player.aimY);
 
       requestAnimationFrame(tick, canvas); // Request that the browser calls tick*/
     };

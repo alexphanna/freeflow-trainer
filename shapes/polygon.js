@@ -1,5 +1,5 @@
 class Polygon {
-    constructor(x, y, radius, r, g, b, sides) {
+    constructor(x, y, radius, r, g, b, sides, filled) {
         this.x = x;
         this.y = y;
         this.r = r;
@@ -7,6 +7,7 @@ class Polygon {
         this.b = b;
         this.radius = radius;
         this.sides = sides;
+        this.filled = filled;
     }
     draw(gl) {
         var n = this.sides; // The number of vertices
@@ -53,6 +54,7 @@ class Polygon {
         gl.vertexAttribPointer(a_FragColor, 3, gl.FLOAT, false, FSIZE * 5, FSIZE * 2);
         gl.enableVertexAttribArray(a_FragColor);
 
-        gl.drawArrays(gl.LINE_LOOP, 0, n);
+        gl.lineWidth(5);
+        gl.drawArrays(this.filled ? gl.TRIANGLE_FAN : gl.LINE_LOOP, 0, n);
     }
 }

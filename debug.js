@@ -1,9 +1,9 @@
 
 
-function drawLine(gl, x0, y0, x1, y1) {
+function drawLine(gl, x0, y0, x1, y1, r, g, b) {
   var vertices = new Float32Array([
-    x0, y0, 0, 1, 0,  
-    x1, y1, 0, 1, 0
+    x0, y0, r, g, b,  
+    x1, y1, r, g, b
   ]);
   var n = 2; // The number of vertices
 

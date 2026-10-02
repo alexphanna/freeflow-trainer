@@ -1,6 +1,6 @@
 class Entity extends Circle {
     constructor(id, x, y, radius, r, g, b, speed) {
-        super(x, y, radius, r, g, b);
+        super(x, y, radius, r, g, b, true);
         this.id = id;
         this.speed = speed;
         this.lastMove = Date.now();
