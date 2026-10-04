@@ -73,8 +73,8 @@ function gameLoop(gl, canvas) {
       let gp = navigator.getGamepads()[e.gamepad.index];
 
       // Draw static shapes
-      // #4988a4
-      var arena = new Polygon(0, 0, 1, .25, .5, .625, 12)
+      // #8ce8ff
+      var arena = new Arena(0, 0, 1, 140 / 255, 232 / 255, 1)
       arena.draw(gl);
 
       // Square pressed
@@ -95,10 +95,11 @@ function gameLoop(gl, canvas) {
           if (closestEnemy.id == enemies[enemyIndex].id)
             enemyIndex = (enemyIndex + 1) % enemies.length;
 
-          /*closestEnemy = player.getClosestEntity(enemies);
+          closestEnemy = player.getClosestEntity(enemies);
           if (closestEnemy != null)
-            player.aimTowardsEntity(closestEnemy);*/
-          player.aimTowardsEntity(enemies[enemyIndex]);
+            player.aimTowardsEntity(closestEnemy);
+          console.log(closestEnemy);
+          //player.aimTowardsEntity(enemies[enemyIndex]);
         }
       }
 

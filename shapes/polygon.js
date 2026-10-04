@@ -54,7 +54,7 @@ class Polygon {
         gl.vertexAttribPointer(a_FragColor, 3, gl.FLOAT, false, FSIZE * 5, FSIZE * 2);
         gl.enableVertexAttribArray(a_FragColor);
 
-        gl.lineWidth(5);
+        gl.lineWidth(2);
         gl.drawArrays(this.filled ? gl.TRIANGLE_FAN : gl.LINE_LOOP, 0, n);
     }
 }
