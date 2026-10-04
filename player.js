@@ -22,8 +22,7 @@ class Player extends Entity {
         // highlight enemy who will be attacked if attack
         var closestEnemy = this.getClosestEnemy(enemies);
         if (closestEnemy != null) {
-            var highlight = new Polygon(closestEnemy.x, closestEnemy.y, .025, 140 / 255, 232 / 255, 1, 100);
-            highlight.draw(gl);
+            closestEnemy.highlight(enemies);
         }
     }
     // I really don't like this method, I feel like it has to contain a lot of repeated code from other drawing functions
