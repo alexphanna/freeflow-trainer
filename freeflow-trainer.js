@@ -91,6 +91,10 @@ function gameLoop(gl, canvas) {
             strongMagnitude: 1.0,
           });
 
+          // Increment combo meter
+          var comboMeter = document.getElementById('combo-meter');
+          comboMeter.textContent = Number.parseInt(comboMeter.textContent.substring(0, comboMeter.textContent.length - 1)) + 1 + "x";
+
           // Should only increment if current attacking enemy is the same as the attacked enemy
           if (closestEnemy.id == enemies[enemyIndex].id)
             enemyIndex = (enemyIndex + 1) % enemies.length;

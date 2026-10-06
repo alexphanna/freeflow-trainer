@@ -1,6 +1,7 @@
 class Player extends Entity {
     constructor(x, y) {
-        super(-1, x, y, .05, 140 / 255, 232 / 255, 1, 6, .0002)
+        // #7de1fe
+        super(-1, x, y, .05, 125 / 255, 225 / 255, 254 / 255, 100, .0002)
         this.lastAttack = 0;
         this.aimX = 0;
         this.aimY = 0;
@@ -25,48 +26,15 @@ class Player extends Entity {
             closestEnemy.highlight(enemies);
         }
     }
-    // I really don't like this method, I feel like it has to contain a lot of repeated code from other drawing functions
     drawFOVCone(gl, x0, y0, x1, y1, x2, y2) {
         var vertices = new Float32Array([
             x0, y0, 0.25, 0.25, 0.25, 0.5,  
             x1, y1, 0.25, 0.25, 0.25, 0.5,
             x2, y2, 0.25, 0.25, 0.25, 0.5        
         ]);
-        var n = 3; // The number of vertices
+        const n = 3; // The number of vertices
 
-        // Create a buffer object
-        var vertexBuffer = gl.createBuffer();
-        if (!vertexBuffer) {
-            console.log('Failed to create the buffer object');
-            return -1;
-        }
-
-        // Bind the buffer object to target
-        gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
-        // Write date into the buffer object
-        gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
-
-        const FSIZE = Float32Array.BYTES_PER_ELEMENT;
-
-        var a_Position = gl.getAttribLocation(gl.program, 'a_Position');
-        if (a_Position < 0) {
-            console.log('Failed to get the storage location of a_Position');
-            return -1;
-        }
-        // Assign the buffer object to a_Position variable
-        gl.vertexAttribPointer(a_Position, 2, gl.FLOAT, false, FSIZE * 6, 0);
-
-        // Enable the assignment to a_Position variable
-        gl.enableVertexAttribArray(a_Position);
-
-        var a_FragColor = gl.getAttribLocation(gl.program, 'a_Color');
-        if (a_FragColor < 0) {
-            console.log('Failed to get the storage location of a_Color');
-            return -1;
-        }
-        
-        gl.vertexAttribPointer(a_FragColor, 4, gl.FLOAT, false, FSIZE * 6, FSIZE * 2);
-        gl.enableVertexAttribArray(a_FragColor);
+        bindBuffers(gl, vertices, 6);
 
         // Required for transparency
         gl.enable(gl.BLEND);
@@ -77,10 +45,6 @@ class Player extends Entity {
     // Hits nearest enemy
     attack(enemy) {
         this.lastAttack = Date.now();
-        
-        // Increment combo meter
-        var comboMeter = document.getElementById('combo-meter');
-        comboMeter.textContent = Number.parseInt(comboMeter.textContent) + 1;
 
         // maybe abstract into moveTo method
         this.x = enemy.x;

@@ -1,28 +1,25 @@
 class Arena extends Circle {
     constructor() {
-        super(0, 0, 1, 140 / 255, 232 / 255, 1);
+        // #727e83
+        super(0, 0, 1, 114 / 255, 126 / 255, 131 / 255);
     }
     draw(gl) {
         super.draw(gl);
 
-        const r = 140 / 255;
-        const g = 232 / 255;
-        const b = 1;
+        const r = 114 / 255; 
+        const g = 126 / 255;
+        const b = 131 / 255;
 
         for (var i = 0; i < 16; i++) {
             drawLine(gl, Math.sin(Math.PI / 8 * i), Math.cos(Math.PI / 8 * i), -Math.sin(Math.PI / 8 * i), -Math.cos(Math.PI / 8 * i), r / 1.5, g / 1.5, b / 1.5);
         }
 
-        var circle = new Circle(0, 0, 4 / 8, r / 2, g / 2, b / 2)
+        var circle = new Circle(0, 0, 1 / 4, 0, 0, 0, true)
         circle.draw(gl);
 
-        var circle = new Circle(0, 0, 6 / 8, r / 2, g / 2, b / 2)
-        circle.draw(gl);
-
-        circle = new Circle(0, 0, 1 / 4, 0, 0, 0, true)
-        circle.draw(gl);
-
-        circle = new Circle(0, 0, 1 / 4, r / 2, g / 2, b / 2)
-        circle.draw(gl);
+        for (var i = 2; i < 8; i += 2) {
+            circle = new Circle(0, 0, i / 8, r / 2, g / 2, b / 2)
+            circle.draw(gl);
+        }
     }
 }

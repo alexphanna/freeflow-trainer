@@ -1,6 +1,6 @@
 class Entity extends Polygon {
     constructor(id, x, y, radius, r, g, b, sides, speed) {
-        super(x, y, radius, r, g, b, sides, true);
+        super(x, y, radius, r, g, b, sides, false);
         this.id = id;
         this.speed = speed;
         this.lastMove = Date.now();
@@ -37,6 +37,8 @@ class Entity extends Polygon {
             this.y = y;
             return;
         }
+        
+        // Should probably implement out-of-bounds logic here
 
         this.x += (dx / dist) * step;
         this.y += (dy / dist) * step;
