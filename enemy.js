@@ -1,7 +1,7 @@
 class Enemy extends Entity {
   constructor(id, x, y) {
     // #d41a25: color from upgrade selection screen in arkham knight
-    super(id, x, y, 0.025, 212 / 255, 26 / 255, 37 / 255, 100, 0.0005);
+    super(id, x, y, 0.025, 212 / 255, 26 / 255, 37 / 255, 100, 3 / 10000);
   }
 
   highlight(enemies) {

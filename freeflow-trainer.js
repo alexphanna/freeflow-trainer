@@ -103,7 +103,7 @@ function gameLoop(gl, canvas) {
       // Square pressed
       if (
         gp.buttons[2].pressed == true &&
-        Date.now() - player.lastAttack > ATTACK_COOLDOWN
+        Date.now() - player.lastAttack > ACTION_COOLDOWN
       ) {
         var closestEnemy = player.getClosestEnemy(enemies);
 
@@ -113,16 +113,8 @@ function gameLoop(gl, canvas) {
           vibrateGamepad(gp, 100);
 
           // Increment combo meter
-          var comboMeter = document.getElementById("combo-meter");
-          comboMeter.textContent =
-            Number.parseInt(
-              comboMeter.textContent.substring(
-                0,
-                comboMeter.textContent.length - 1,
-              ),
-            ) +
-            1 +
-            "x";
+          var comboMeter = document.getElementById("combo");
+          comboMeter.textContent = Number.parseInt(comboMeter.textContent.substring(0,comboMeter.textContent.length - 1,),) +1 + "x";
 
           // Should only increment if current attacking enemy is the same as the attacked enemy
           if (closestEnemy.id == enemies[enemyIndex].id)
@@ -135,11 +127,12 @@ function gameLoop(gl, canvas) {
         }
       }
       // Triangle pressed
-      else if (gp.buttons[3].pressed == true) {
-        if (Math.hypot(enemies[enemyIndex].x - player.x, enemies[enemyIndex].y - player.y) < 0.25) {
+      else if (gp.buttons[3].pressed == true &&
+        Date.now() - player.lastAttack > ACTION_COOLDOWN) {
+        if (player.distanceToEntity(enemies[enemyIndex]) < COUNTER_RADIUS) {
           vibrateGamepad(gp, 100);
 
-          enemies[enemyIndex].hit();
+          player.attack(enemies[enemyIndex]);
           enemyIndex = (enemyIndex + 1) % enemies.length;
         }
       }
@@ -150,15 +143,34 @@ function gameLoop(gl, canvas) {
         // move the enemy whose up towards player
         if (i == enemyIndex) {
           enemies[i].moveTowardsEntity(player);
+          const dist = player.distanceToEntity(enemies[i]);
 
-          var incoming = new Incoming(enemies[i].x, enemies[i].y, enemies[i].radius * 2.5);
-          incoming.draw(gl);
+          if (dist < ENEMY_ATTACK_RADIUS) {
+            vibrateGamepad(gp, 200);
+
+            player.hit();
+            enemyIndex = (enemyIndex + 1) % enemies.length;
+
+            // Update health
+            var health = document.getElementById("health");
+            health.textContent = player.health;
+          }
+          if (dist < INCOMING_RADIUS) {
+            var incoming = new Incoming(enemies[i].x, enemies[i].y, enemies[i].radius * 2.5); 
+            incoming.draw(gl);
+          }
           // debug tracking line
           //drawLine(gl, enemies[i].x, enemies[i].y, player.x, player.y, 0, 1, 0)
         } else {
-          // idle animation
-          enemies[i].lastMove = Date.now();
-          enemies[i].aimTowardsEntity(player);
+            // enemy moves idly around the arena, but not towards the player
+            if ((enemies[i].aimX == null && enemies[i].aimY == null) || (Math.hypot(enemies[i].aimX - enemies[i].x, enemies[i].aimY - enemies[i].y) < 0.1)) {
+              do {
+                enemies[i].aimX = enemies[i].x + (Math.random() - 0.5);
+                enemies[i].aimY = enemies[i].y + (Math.random() - 0.5);
+              } while (Math.hypot(enemies[i].aimX, enemies[i].aimY) > 1);
+            }
+            enemies[i].speed =  3 / 100000;
+            enemies[i].moveTowards(enemies[i].aimX, enemies[i].aimY);
         }
       }
 

@@ -5,14 +5,21 @@ class Entity extends Polygon {
         this.speed = speed;
         this.lastMove = Date.now();
         this.lastHit = 0;
-        this.aimX = 0;
-        this.aimY = 0;
+        this.aimX = null;
+        this.aimY = null;
+        this.health = 100;
     }
     stunned() {
         return Date.now() - this.lastHit <= STUN_DURATION;
     }
     hit() {
+        this.health -= 33;
         this.lastHit = Date.now();
+    }
+    distanceToEntity(entity) {
+        const dx = entity.x - this.x;
+        const dy = entity.y - this.y;
+        return Math.hypot(dx, dy);
     }
     aimTowardsEntity(entity) {
         this.aimTowards(entity.x, entity.y)
@@ -22,6 +29,7 @@ class Entity extends Polygon {
         this.aimY = y;
     }
     moveTowardsEntity(entity) {
+        this.speed =  3 / 10000;
         this.moveTowards(entity.x, entity.y)
     }
     moveTowards(x, y) {
@@ -36,6 +44,12 @@ class Entity extends Polygon {
         const elapsed = now - this.lastMove;
         this.lastMove = now;
 
+        // out-of-bounds
+        if (Math.hypot(this.x, this.y) > 1 && Math.hypot(x, y) > 1) {
+            // TODO: make it so you can press against the border and move along it, but not go outside of it
+            return;
+        }
+
         const dx = x - this.x;
         const dy = y - this.y;
         const dist = Math.hypot(dx, dy);
@@ -46,8 +60,6 @@ class Entity extends Polygon {
             this.y = y;
             return;
         }
-        
-        // Should probably implement out-of-bounds logic here
 
         this.x += (dx / dist) * step;
         this.y += (dy / dist) * step;

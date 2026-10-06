@@ -4,6 +4,17 @@ html, body {
     background-color: black;
 }
 
+#container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+p {
+    width: 100px;
+    text-align: center;
+}
+
 * {
     color: rgb(140, 232, 255);
     font-weight: 900;

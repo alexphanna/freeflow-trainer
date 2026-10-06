@@ -7,12 +7,13 @@
   </head>
 
   <body onload="main()">
-    <center>
+    <div id="container">
+      <p id="health">100</p>
       <canvas id="webgl" width="800" height="800">
         Please use a browser that supports "canvas"
       </canvas>
-      <p id="combo-meter">0x</p>
-    </center>
+      <p id="combo">0x</p>
+    </div>
 
     <script src="lib/webgl-utils.js"></script>
     <script src="lib/webgl-debug.js"></script>
