@@ -1,16 +1,25 @@
 class Entity extends Polygon {
     constructor(id, x, y, radius, r, g, b, sides, speed) {
-        super(x, y, radius, r, g, b, sides, false);
+        super(x, y, radius, r, g, b, 1.0, sides, false);
         this.id = id;
         this.speed = speed;
         this.lastMove = Date.now();
         this.lastHit = 0;
+        this.aimX = 0;
+        this.aimY = 0;
     }
     stunned() {
         return Date.now() - this.lastHit <= STUN_DURATION;
     }
     hit() {
         this.lastHit = Date.now();
+    }
+    aimTowardsEntity(entity) {
+        this.aimTowards(entity.x, entity.y)
+    }
+    aimTowards(x, y) {
+        this.aimX = x;
+        this.aimY = y;
     }
     moveTowardsEntity(entity) {
         this.moveTowards(entity.x, entity.y)
@@ -42,6 +51,8 @@ class Entity extends Polygon {
 
         this.x += (dx / dist) * step;
         this.y += (dy / dist) * step;
+
+        this.aimTowards(x, y);
     }
     getClosestEntity(entities) {
         var closestEntity = null

@@ -14,6 +14,10 @@ function bindBuffers(gl, vertices, stride) {
 
     const FSIZE = Float32Array.BYTES_PER_ELEMENT;
 
+    var u_UseTexture = gl.getUniformLocation(gl.program, 'u_UseTexture');
+    gl.uniform1i(u_UseTexture, false);
+
+
     var a_Position = gl.getAttribLocation(gl.program, 'a_Position');
     if (a_Position < 0) {
         console.log('Failed to get the storage location of a_Position');
@@ -33,4 +37,15 @@ function bindBuffers(gl, vertices, stride) {
     
     gl.vertexAttribPointer(a_FragColor, stride - 2, gl.FLOAT, false, FSIZE * stride, FSIZE * 2);
     gl.enableVertexAttribArray(a_FragColor);
+}
+
+function vibrateGamepad(gamepad, duration) {
+    if (gamepad && gamepad.vibrationActuator) {
+        gamepad.vibrationActuator.playEffect('dual-rumble', {
+            startDelay: 0,
+            duration: duration,
+            weakMagnitude: 1.0,
+            strongMagnitude: 1.0
+        });
+    }
 }

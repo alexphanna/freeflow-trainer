@@ -3,8 +3,6 @@ class Player extends Entity {
         // #7de1fe
         super(-1, x, y, .05, 125 / 255, 225 / 255, 254 / 255, 100, .0002)
         this.lastAttack = 0;
-        this.aimX = 0;
-        this.aimY = 0;
         this.fov = 45;
     }
     draw(gl, enemies) {
@@ -27,6 +25,7 @@ class Player extends Entity {
         }
     }
     drawFOVCone(gl, x0, y0, x1, y1, x2, y2) {
+        // Cone
         var vertices = new Float32Array([
             x0, y0, 0.25, 0.25, 0.25, 0.5,  
             x1, y1, 0.25, 0.25, 0.25, 0.5,
@@ -41,6 +40,10 @@ class Player extends Entity {
         gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
         gl.drawArrays(gl.TRIANGLE_FAN, 0, n);
+
+        // Circle
+        var circle = new Circle(x0, y0, 0.25, 0.25, 0.25, 0.25, 0.5, true);
+        circle.draw(gl);
     }
     // Hits nearest enemy
     attack(enemy) {
@@ -51,17 +54,6 @@ class Player extends Entity {
         this.y = enemy.y;
 
         enemy.hit();
-    }
-    // Counter nearest uncountered enemy
-    counter() {
-        
-    }
-    aimTowardsEntity(entity) {
-        this.aimTowards(entity.x, entity.y)
-    }
-    aimTowards(x, y) {
-        this.aimX = x;
-        this.aimY = y;
     }
     // first enemy close to aim line within FOV degrees around aim line
     getClosestEnemy(enemies) {
