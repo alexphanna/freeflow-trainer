@@ -1,5 +1,6 @@
 const ACTION_COOLDOWN = 500;
 const STUN_DURATION = 2000;
+const COMBO_RESET_DURATION = 1000;
 
 // Radii
 

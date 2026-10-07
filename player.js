@@ -42,18 +42,20 @@ class Player extends Entity {
         gl.drawArrays(gl.TRIANGLE_FAN, 0, n);
 
         // Circle
-        var circle = new Circle(x0, y0, 0.25, 0.25, 0.25, 0.25, 0.5, true);
-        circle.draw(gl);
+        /*var circle = new Circle(x0, y0, 0.25, 0.25, 0.25, 0.25, 0.5, true);
+        circle.draw(gl);*/
     }
     // Hits nearest enemy
-    attack(enemy) {
+    attack(enemy, hit = true) {
         this.lastAttack = Date.now();
 
         // maybe abstract into moveTo method
         this.x = enemy.x;
         this.y = enemy.y;
 
-        enemy.hit();
+        if (hit) {
+            enemy.hit();
+        }
     }
     // first enemy close to aim line within FOV degrees around aim line
     getClosestEnemy(enemies) {

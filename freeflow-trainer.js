@@ -77,9 +77,19 @@ function gameLoop(gl, canvas) {
     );
   }
   var enemyIndex = 0;
+  var lastIncoming = 0;
+  var incomingCooldown = 1000; // milliseconds
+
+  var nextEnemy = function () {
+    enemyIndex = (enemyIndex + 1) % enemies.length;
+    lastIncoming = Date.now();
+    incomingCooldown = Math.random() * 2000 + 500; // randomize incoming cooldown between 500ms and 2500ms
+  }
 
   var player = new Player(0, 0);
   player.aimTowardsEntity(enemies[enemyIndex]);
+
+  var gameover = false;
 
   window.addEventListener("gamepadconnected", (e) => {
     // https://developer.mozilla.org/en-US/docs/Web/API/Gamepad_API/Using_the_Gamepad_API
@@ -100,6 +110,10 @@ function gameLoop(gl, canvas) {
       var arena = new Arena(0, 0, 1, 140 / 255, 232 / 255, 1);
       arena.draw(gl);
 
+      if (player.lastAttack + COMBO_RESET_DURATION < Date.now()) {
+        resetComboMeter();
+      }
+
       // Square pressed
       if (
         gp.buttons[2].pressed == true &&
@@ -109,16 +123,22 @@ function gameLoop(gl, canvas) {
 
         if (closestEnemy != null) {
           player.attack(closestEnemy);
+          if (closestEnemy.health <= 0) {
+            enemies.splice(enemies.indexOf(closestEnemy), 1);
+            if (enemyIndex >= enemies.length) {
+              enemyIndex = 0;
+            }
+          }
+          // Should only increment if current incoming enemy is the same as the attacked enemy
+          else if (closestEnemy.id == enemies[enemyIndex].id) {
+            nextEnemy();
+          }
 
           vibrateGamepad(gp, 100);
 
           // Increment combo meter
           var comboMeter = document.getElementById("combo");
           comboMeter.textContent = Number.parseInt(comboMeter.textContent.substring(0,comboMeter.textContent.length - 1,),) +1 + "x";
-
-          // Should only increment if current attacking enemy is the same as the attacked enemy
-          if (closestEnemy.id == enemies[enemyIndex].id)
-            enemyIndex = (enemyIndex + 1) % enemies.length;
 
           /*closestEnemy = player.getClosestEntity(enemies);
           if (closestEnemy != null) player.aimTowardsEntity(closestEnemy);
@@ -132,8 +152,13 @@ function gameLoop(gl, canvas) {
         if (player.distanceToEntity(enemies[enemyIndex]) < COUNTER_RADIUS) {
           vibrateGamepad(gp, 100);
 
-          player.attack(enemies[enemyIndex]);
-          enemyIndex = (enemyIndex + 1) % enemies.length;
+          player.attack(enemies[enemyIndex], false);
+
+          // Increment combo meter
+          var comboMeter = document.getElementById("combo");
+          comboMeter.textContent = Number.parseInt(comboMeter.textContent.substring(0,comboMeter.textContent.length - 1,),) +1 + "x";
+
+          nextEnemy();
         }
       }
 
@@ -141,7 +166,7 @@ function gameLoop(gl, canvas) {
         enemies[i].draw(gl);
 
         // move the enemy whose up towards player
-        if (i == enemyIndex) {
+        if (i == enemyIndex && Date.now() - lastIncoming > incomingCooldown) {
           enemies[i].moveTowardsEntity(player);
           const dist = player.distanceToEntity(enemies[i]);
 
@@ -149,11 +174,19 @@ function gameLoop(gl, canvas) {
             vibrateGamepad(gp, 200);
 
             player.hit();
-            enemyIndex = (enemyIndex + 1) % enemies.length;
+
+            nextEnemy();
 
             // Update health
             var health = document.getElementById("health");
             health.textContent = player.health;
+            if (player.health <= 0) {
+              gameover = true;
+            }
+            else {
+              // in else statement because want to show combo after death
+              resetComboMeter();
+            }
           }
           if (dist < INCOMING_RADIUS) {
             var incoming = new Incoming(enemies[i].x, enemies[i].y, enemies[i].radius * 2.5); 
@@ -189,8 +222,18 @@ function gameLoop(gl, canvas) {
         player.aimTowards(gp.axes[2], -gp.axes[3]);
       }
 
+      if (gameover) {
+        alert("Game Over! Refresh the page to play again.");
+        return;
+      }
+
       requestAnimationFrame(tick, canvas); // Request that the browser calls tick*/
     };
     tick();
   });
+}
+
+function resetComboMeter() {
+  var comboMeter = document.getElementById("combo");
+  comboMeter.textContent = "0x";
 }
